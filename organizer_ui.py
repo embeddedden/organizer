@@ -30,7 +30,7 @@ class TaskButton(Button):
     Thus, when a user starts to work on a task he pushes the button, and when
     finishes - releases it.
     """
-
+    
     def __init__(self, **kwargs):
         """ Expand Button kivy class. """
         super().__init__(**kwargs)
@@ -43,7 +43,6 @@ class TaskButton(Button):
         self.time_in_seconds = 0
         self.c_event = Clock.create_trigger(self.update_clock, timeout=1,
                                             interval=True)
-
     def on_relocate_event(self, *args):
         """ Default handler for on_relocate_event. """
         pass
