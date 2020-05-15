@@ -15,27 +15,42 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.core.window import Window
 
+# Regulate button height through this parameter.
 BUTTON_HEIGHT = 70
 
 class TaskButton(Button):
+    """
+    Class representing a button for a task expanding standard kivy button.
+
+    The distinctive feature of the class is its capability to be in two states:
+    active or waiting. In active state a button shold look like a push button.
+    Thus, when a user starts to work on a task he pushes the button, and when
+    finishes - releases it.
+    """
 
     def __init__(self, **kwargs):
-
+        """ Expand Button kivy class. """
         super(TaskButton, self).__init__(**kwargs)
         self.register_event_type('on_relocate_event')
 
     def on_relocate_event(self, *args):
-
+        """ Default handler for on_relocate_event. """
         pass
 
     def on_press(self):
-
+        """ Override default on_press handler. """
         self.dispatch('on_relocate_event')
 
 class VertBoxLayout(BoxLayout):
+    """
+    A box layout that can receive and release TaskButtons.
+
+    The class expands the default BoxLayout kivy widget. It adds a placeholder
+    label for empty list.
+    """
 
     def __init__(self, **kwargs):
-
+        """ Initialize class by placing a placeholder Label. """
         super(VertBoxLayout, self).__init__(**kwargs)
         self.empty_label = Label(size_hint=(None, None),
                                  text="Нет текущих задач",
@@ -43,41 +58,55 @@ class VertBoxLayout(BoxLayout):
         super().add_widget(self.empty_label)
 
     def add_widget(self, *args):
-
+        """ Override BoxLayou.addWidget(). """
         if self.children[0] == self.empty_label:
             super().remove_widget(self.empty_label)
 
         super().add_widget(*args)
 
     def remove_widget(self, *args):
-
+        """ Override BoxLayou.removeWidget(). """
         super().remove_widget(*args)
         if not self.children:
             super().add_widget(self.empty_label)
 
 
 class TaskScrollView(ScrollView):
+    """
+    ScrollView that is able to receive and remove TaskButtons.
+
+    Class consists of VertBoxLayout widget and is able to receive/send
+    TaskButtons from/to its VertBoxLayout child. Class exapnd default Kive
+    ScrollView class.
+    """
 
     def __init__(self, **kwargs):
-
+        """ Create a child VertBoxLayout widget and initialize class. """
         super(TaskScrollView, self).__init__(**kwargs)
         self.box_lt = VertBoxLayout(size_hint_y=None, orientation='vertical')
         self.box_lt.bind(minimum_height=self.box_lt.setter('height'))
         self.add_widget(self.box_lt)
 
     def add_descendant(self, obj):
-
+        """ Add widget obj to the child box layout. """
         self.box_lt.add_widget(obj)
 
     def remove_descendant(self, obj):
-
+        """ Remove widget obj from the child box layout. """
         self.box_lt.remove_widget(obj)
 
 
 class MainScreen(BoxLayout):
+    """
+    Class for managing UI of the organizer application.
+
+    It creates all the descendant widgets and place them in the BoxLayout. It
+    also manages all the interaction between descendants, e.g. passing a
+    TaskButton from one TaskScrollView->VertBoxLayout to the other.
+    """
 
     def __init__(self, **kwargs):
-
+        """ Initialize the main window and place all the elements."""
         super(MainScreen, self).__init__(**kwargs)
         self.size_hint_x = None
         self.width = 300
@@ -132,7 +161,7 @@ class MainScreen(BoxLayout):
 
 
     def relocation_routine(self, *args):
-
+        """ Relocate a TaskButton from one layout to the other. """
         if args[-1] in self.task_buttons.box_lt.children:
             self.task_buttons.remove_descendant(args[-1])
             self.current_tasks.add_descendant(args[-1])
@@ -144,9 +173,10 @@ class MainScreen(BoxLayout):
 
 
 class Organizer(App):
+    """ Class representing the Application. """
 
     def build(self):
-
+        """ Routine for creating the Window. """
         return MainScreen()
 
 if __name__ == '__main__':
