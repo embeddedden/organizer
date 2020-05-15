@@ -70,7 +70,6 @@ class VertBoxLayout(BoxLayout):
         if not self.children:
             super().add_widget(self.empty_label)
 
-
 class TaskScrollView(ScrollView):
     """
     ScrollView that is able to receive and remove TaskButtons.
@@ -94,7 +93,6 @@ class TaskScrollView(ScrollView):
     def remove_descendant(self, obj):
         """ Remove widget obj from the child box layout. """
         self.box_lt.remove_widget(obj)
-
 
 class MainScreen(BoxLayout):
     """
@@ -159,7 +157,6 @@ class MainScreen(BoxLayout):
                                  size=[Window.width, BUTTON_HEIGHT])
         self.add_widget(add_task_button)
 
-
     def relocation_routine(self, *args):
         """ Relocate a TaskButton from one layout to the other. """
         if args[-1] in self.task_buttons.box_lt.children:
@@ -168,9 +165,6 @@ class MainScreen(BoxLayout):
         else:
             self.current_tasks.remove_descendant(args[-1])
             self.task_buttons.add_descendant(args[-1])
-        print("Relocating")
-
-
 
 class Organizer(App):
     """ Class representing the Application. """
