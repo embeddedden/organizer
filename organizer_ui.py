@@ -27,11 +27,12 @@ class TaskButton(Button):
     Thus, when a user starts to work on a task he pushes the button, and when
     finishes - releases it.
     """
-
+    
     def __init__(self, **kwargs):
         """ Expand Button kivy class. """
         super(TaskButton, self).__init__(**kwargs)
         self.register_event_type('on_relocate_event')
+        self.activity_state = 'Waiting' # or 'Active', or 'Removed'
 
     def on_relocate_event(self, *args):
         """ Default handler for on_relocate_event. """
@@ -40,6 +41,14 @@ class TaskButton(Button):
     def on_press(self):
         """ Override default on_press handler. """
         self.dispatch('on_relocate_event')
+        #TODO: we should remove background_normal because it is mixed with
+        #background_color
+        if self.activity_state == 'Waiting':
+            self.activity_state = 'Active'
+            self.background_color = (0, 0.9, 0, 1)
+        else:
+            self.activity_state = 'Waiting'
+            self.background_color = (1, 1, 1, 1)
 
 class VertBoxLayout(BoxLayout):
     """
