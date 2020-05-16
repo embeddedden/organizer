@@ -13,6 +13,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
+from kivy.uix.popup import Popup
 from kivy.core.window import Window
 
 # Regulate button height through this parameter.
@@ -148,7 +149,20 @@ class MainScreen(BoxLayout):
         add_task_button = Button(text="Добавить новую задачу",
                                  size_hint=(None, None),
                                  size=[Window.width, BUTTON_HEIGHT])
+        add_task_button.bind(on_press=self.create_new_task)
         self.add_widget(add_task_button)
+        
+    def create_new_task(self, *args):
+        
+        popup_layout = BoxLayout(orientation='vertical')
+        create_lbl = Label(text='Создай себе задачу')
+        create_btn = Button(text='Создать задачу')
+        popup_layout.add_widget(create_lbl)
+        popup_layout.add_widget(create_btn)
+        popup = Popup(title='Создай новую задачу', content=popup_layout,
+                      size_hint=(1, 0.5))
+        create_btn.bind(on_release=popup.dismiss)
+        popup.open()
 
     def relocation_routine(self, *args):
         """ Relocate a TaskButton from one layout to the other. """
