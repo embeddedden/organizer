@@ -16,6 +16,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
+from kivy.clock import Clock
 
 # Regulate button height through this parameter.
 BUTTON_HEIGHT = 70
@@ -35,6 +36,13 @@ class TaskButton(Button):
         super(TaskButton, self).__init__(**kwargs)
         self.register_event_type('on_relocate_event')
         self.activity_state = 'Waiting' # or 'Active', or 'Removed'
+        self.name = self.text
+        self.hours = 0
+        self.minutes = 0
+        self.seconds = 0
+        self.time_in_seconds = 0
+        self.c_event = Clock.create_trigger(self.update_clock, timeout=1,
+                                            interval=True)
 
     def on_relocate_event(self, *args):
         """ Default handler for on_relocate_event. """
@@ -46,11 +54,22 @@ class TaskButton(Button):
         #TODO: we should remove background_normal because it is mixed with
         #background_color
         if self.activity_state == 'Waiting':
+            self.c_event()
             self.activity_state = 'Active'
             self.background_color = (0, 0.9, 0, 1)
+            self.text = f'{self.name} ({self.hours:02}:{self.minutes:02}:{self.seconds:02})'
         else:
             self.activity_state = 'Waiting'
+            self.c_event.cancel()
             self.background_color = (1, 1, 1, 1)
+
+    def update_clock(self, *args):
+        """ Update time for active task. """
+        self.time_in_seconds += 1
+        self.seconds = self.time_in_seconds % 60
+        self.minutes = self.time_in_seconds // 60 % 60
+        self.hours = self.time_in_seconds // 60 // 60 % 24
+        self.text = f'{self.name} ({self.hours:02}:{self.minutes:02}:{self.seconds:02})'
 
 class VertBoxLayout(BoxLayout):
     """
