@@ -14,6 +14,7 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.popup import Popup
+from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 
 # Regulate button height through this parameter.
@@ -28,7 +29,7 @@ class TaskButton(Button):
     Thus, when a user starts to work on a task he pushes the button, and when
     finishes - releases it.
     """
-    
+
     def __init__(self, **kwargs):
         """ Expand Button kivy class. """
         super().__init__(**kwargs)
@@ -149,20 +150,38 @@ class MainScreen(BoxLayout):
         add_task_button = Button(text="Добавить новую задачу",
                                  size_hint=(None, None),
                                  size=[Window.width, BUTTON_HEIGHT])
-        add_task_button.bind(on_press=self.create_new_task)
+        add_task_button.bind(on_press=self.create_new_task_popup)
         self.add_widget(add_task_button)
-        
-    def create_new_task(self, *args):
-        
+
+    def create_new_task_popup(self, *args):
+        """ Create a popup for a new task. """
         popup_layout = BoxLayout(orientation='vertical')
-        create_lbl = Label(text='Создай себе задачу')
-        create_btn = Button(text='Создать задачу')
-        popup_layout.add_widget(create_lbl)
+        popup_layout.spacing = 5
+        popup_layout.bind(minimum_height=popup_layout.setter('height'))
+        create_btn = Button(text='Создать задачу',
+                            size_hint_y=None,
+                            height=BUTTON_HEIGHT)
+        self.create_edit = TextInput(font_size=18, halign='center',
+                                     hint_text='Введите название задачи',
+                                     size_hint_y=None,
+                                     height=BUTTON_HEIGHT,
+                                     multiline=False)
+        self.create_edit.bind(on_text_validate=self.create_task)
+        popup_layout.add_widget(self.create_edit)
         popup_layout.add_widget(create_btn)
-        popup = Popup(title='Создай новую задачу', content=popup_layout,
-                      size_hint=(1, 0.5))
-        create_btn.bind(on_release=popup.dismiss)
-        popup.open()
+        self.popup = Popup(title='Создай новую задачу', content=popup_layout,
+                           size_hint=(1, None),
+                           height=create_btn.height+self.create_edit.height+100)
+        create_btn.bind(on_release=self.create_task)
+        self.popup.open()
+
+    def create_task(self, *args):
+        """ Add a task to session tasks. """
+        self.popup.dismiss()
+        tmp_butt = TaskButton(text=self.create_edit.text, size_hint=(None, None),
+                              size=[Window.width, BUTTON_HEIGHT])
+        tmp_butt.bind(on_relocate_event=self.relocation_routine)
+        self.task_buttons.add_descendant(tmp_butt)
 
     def relocation_routine(self, *args):
         """ Relocate a TaskButton from one layout to the other. """
