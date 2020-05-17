@@ -16,7 +16,10 @@ class Task:
         :param name: name of the activity
         :param activity_periods: list of tuples (start_time, end_time)
         """
-        self.name = name
+        if name is not None:
+            self.name = name
+        else:
+            self.name = "New task"
         self.state = 'Stopped' # or Active, or Paused
         self.current_start_time = None
         if activity_periods is not None:
@@ -41,6 +44,7 @@ class Task:
         """ Stop counting time for the task. """
         self.activity_periods.append((self.current_start_time, datetime.now()))
         self.state = 'Stopped'
+        print("Task is accomplished, duration:", self.activity_periods[0])
 
     def pause_task(self):
         """ Pause the counting time for the task. """
