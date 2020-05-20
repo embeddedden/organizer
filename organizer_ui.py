@@ -220,7 +220,7 @@ class MainScreen(BoxLayout):
     def create_task(self, *args):
         """ Add a task to session tasks. """
         #TODO: add exception handling
-        self.task_dispatcher.add_new_task(text=self.create_edit.text)
+        self.task_dispatcher.add_new_task(self.create_edit.text)
         tmp_butt = TaskButton(text=self.create_edit.text, size_hint=(None, None),
                               size=[Window.width, BUTTON_HEIGHT])
         tmp_butt.bind(on_relocate_event=self.relocation_routine)
