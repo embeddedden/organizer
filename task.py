@@ -7,15 +7,21 @@ from datetime import datetime
 class Task:
     """ This is a class representing task entity. """
 
-    def __init__(self, name="New task", activity_periods=None):
+    def __init__(self, name="New task", category=None, activity_periods=None):
         """
         Initialize task entity.
 
         The task entity is needed to account all activity's busy periods.
 
         :param name: name of the activity
+        :parem category: category of the activity
         :param activity_periods: list of tuples (start_time, end_time)
         """
+        if category is not None:
+            self.category = category
+        else:
+            self.category = "Empty"
+
         if name is not None:
             self.name = name
         else:
