@@ -4,6 +4,10 @@ Class for a task abstraction.
 
 from datetime import datetime
 
+def task_id(task_name, task_category):
+    """ Transform task category and name into a task id. """
+    return task_category + '|' + task_name
+
 class Task:
     """ This is a class representing task entity. """
 
@@ -28,10 +32,13 @@ class Task:
             self.name = "New task"
         self.state = 'Stopped' # or Active, or Paused
         self.current_start_time = None
+        self.new_activity_periods = []
         if activity_periods is not None:
             self.activity_periods = activity_periods
         else:
-            self.activity_periods = []
+            creation_time = datetime.now()
+            self.activity_periods = [(creation_time, creation_time)]
+            self.new_activity_periods = [(creation_time, creation_time)]
 
     def change_task_name(self, new_name):
         """ Assign a new name to the task """
@@ -49,8 +56,8 @@ class Task:
     def stop_task(self):
         """ Stop counting time for the task. """
         self.activity_periods.append((self.current_start_time, datetime.now()))
+        self.new_activity_periods.append((self.current_start_time, datetime.now()))
         self.state = 'Stopped'
-        print("Task is accomplished, duration:", self.activity_periods[0])
 
     def pause_task(self):
         """ Pause the counting time for the task. """

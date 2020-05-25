@@ -17,6 +17,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 from kivy.clock import Clock
+from task_dispatcher import TaskDispatcher
 
 # Regulate button height through this parameter.
 BUTTON_HEIGHT = 70
@@ -35,6 +36,7 @@ class TaskButton(Button):
         """ Expand Button kivy class. """
         super().__init__(**kwargs)
         self.register_event_type('on_relocate_event')
+        self.category = 'Empty'
         self.activity_state = 'Waiting' # or 'Active', or 'Removed'
         self.name = self.text
         self.hours = 0
@@ -139,6 +141,8 @@ class MainScreen(BoxLayout):
         self.width = 300
         self.orientation = 'vertical'
         self.spacing = 8
+        self.task_dispatcher = TaskDispatcher()
+        self.previous_tasks = self.task_dispatcher.get_previous_tasks()
         menu_box = BoxLayout(size_hint=(None, None), orientation='horizontal')
         menu_button = Button(text="Меню", size_hint=(None, None),
                              size=[Window.width, BUTTON_HEIGHT])
@@ -164,6 +168,13 @@ class MainScreen(BoxLayout):
                                            width=Window.width)
         self.add_widget(self.task_buttons)
         self.task_buttons.bind(on_relocate_descendant=self.relocation_routine)
+        for task_to_insert in self.previous_tasks:
+            task_button = TaskButton(text=task_to_insert.name,
+                                     size_hint=(None, None),
+                                     size=[Window.width, BUTTON_HEIGHT])
+            task_button.category = task_to_insert.category
+            task_button.bind(on_relocate_event=self.relocation_routine)
+            self.task_buttons.add_descendant(task_button)
 
         add_task_button = Button(text="Добавить новую задачу",
                                  size_hint=(None, None),
@@ -197,17 +208,21 @@ class MainScreen(BoxLayout):
         """ Add a task to session tasks. """
         #TODO: add exception handling
         self.task_dispatcher.add_new_task(self.create_edit.text)
-        tmp_butt = TaskButton(text=self.create_edit.text, size_hint=(None, None),
+        tmp_butt = TaskButton(text=self.create_edit.text,
+                              size_hint=(None, None),
                               size=[Window.width, BUTTON_HEIGHT])
+        tmp_butt.category = 'Empty'
         tmp_butt.bind(on_relocate_event=self.relocation_routine)
         self.task_buttons.add_descendant(tmp_butt)
 
     def relocation_routine(self, *args):
         """ Relocate a TaskButton from one layout to the other. """
         if args[-1] in self.task_buttons.box_lt.children:
+            self.task_dispatcher.make_task_active(args[-1].name, args[-1].category)
             self.task_buttons.remove_descendant(args[-1])
             self.current_tasks.add_descendant(args[-1])
         else:
+            self.task_dispatcher.make_task_stopped(args[-1].name, args[-1].category)
             self.current_tasks.remove_descendant(args[-1])
             self.task_buttons.add_descendant(args[-1])
 

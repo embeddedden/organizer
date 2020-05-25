@@ -5,33 +5,24 @@ Created on Mon May 18 20:13:04 2020
 @author: embden
 """
 
-class DataOrganizer:
+from abc import ABC, abstractmethod
+
+class DataOrganizer(ABC):
     """ Abstract class defining interface for CSV, DB managers. """
-    
-    def __init__():
-        pass
-    
+
+    @abstractmethod
     def read_previous_tasks(self, period):
-        """ 
+        """
         Read task data from database.
-        
+
         :param period: start and end dates of period of requested tasks.
         :returns: a list of Tasks.
         """
-        pass
-        
-    def read_previous_tasks_names(self, period):
-        """ 
-        Read task data from database.
-        
-        :param period: start and end dates of period of requested tasks.
-        :returns: a list of Task names for creating list of tasks.
-        """
-        pass
-    
-    def write_tasks_data(self, tasks_data):
+
+    @abstractmethod
+    def write_tasks_data(self, tasks):
         """
         Write tasks data into a database.
-        
-        :param tasks_data: a list of Task entities.
+
+        :param tasks: a list of Task entities.
         """
