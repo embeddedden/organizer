@@ -17,6 +17,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 from kivy.clock import Clock
+from kivy.uix.dropdown import DropDown
 from task_dispatcher import TaskDispatcher
 
 # Regulate button height through this parameter.
@@ -34,7 +35,7 @@ class TaskButton(Button):
 
     def __init__(self, **kwargs):
         """ Expand Button kivy class. """
-        super(TaskButton, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.register_event_type('on_relocate_event')
         self.category = 'Empty'
         self.activity_state = 'Waiting' # or 'Active', or 'Removed'
@@ -83,7 +84,7 @@ class VertBoxLayout(BoxLayout):
 
     def __init__(self, **kwargs):
         """ Initialize class by placing a placeholder Label. """
-        super(VertBoxLayout, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.empty_label = Label(size_hint=(None, None),
                                  text="Нет текущих задач",
                                  size=(Window.width, BUTTON_HEIGHT))
@@ -113,7 +114,7 @@ class TaskScrollView(ScrollView):
 
     def __init__(self, **kwargs):
         """ Create a child VertBoxLayout widget and initialize class. """
-        super(TaskScrollView, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.box_lt = VertBoxLayout(size_hint_y=None, orientation='vertical')
         self.box_lt.bind(minimum_height=self.box_lt.setter('height'))
         self.add_widget(self.box_lt)
@@ -137,7 +138,7 @@ class MainScreen(BoxLayout):
 
     def __init__(self, **kwargs):
         """ Initialize the main window and place all the elements."""
-        super(MainScreen, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.size_hint_x = None
         self.width = 300
         self.orientation = 'vertical'
@@ -183,11 +184,25 @@ class MainScreen(BoxLayout):
         add_task_button.bind(on_press=self.create_new_task_popup)
         self.add_widget(add_task_button)
 
+
     def create_new_task_popup(self, *args):
         """ Create a popup for a new task. """
         popup_layout = BoxLayout(orientation='vertical')
         popup_layout.spacing = 5
         popup_layout.bind(minimum_height=popup_layout.setter('height'))
+        
+        drop_down = DropDown(size_hint=(None, None),
+                             size=[Window.width, BUTTON_HEIGHT])
+
+        for cat in self.task_dispatcher.get_existing_categories():
+            btn = Button(text=cat, size_hint_y=None, height=BUTTON_HEIGHT)
+            drop_down.add_widget(btn)
+        drop_down_button = Button(text="Выбери категорию",
+                                  size_hint_y=None,
+                                  height=BUTTON_HEIGHT,)
+        drop_down_button.bind(on_release=drop_down.open)
+        popup_layout.add_widget(drop_down_button)
+        
         create_btn = Button(text='Создать задачу',
                             size_hint_y=None,
                             height=BUTTON_HEIGHT)
@@ -201,13 +216,14 @@ class MainScreen(BoxLayout):
         popup_layout.add_widget(create_btn)
         self.popup = Popup(title='Создай новую задачу', content=popup_layout,
                            size_hint=(1, None),
-                           height=create_btn.height+self.create_edit.height+100)
+                           height=create_btn.height+self.create_edit.height+
+                           drop_down_button.height+100)
         create_btn.bind(on_release=self.create_task)
         self.popup.open()
 
     def create_task(self, *args):
         """ Add a task to session tasks. """
-        #TODO: add exception handling
+        #TODO: add exception handling        
         self.task_dispatcher.add_new_task(self.create_edit.text)
         tmp_butt = TaskButton(text=self.create_edit.text,
                               size_hint=(None, None),

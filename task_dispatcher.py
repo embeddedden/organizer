@@ -20,6 +20,7 @@ class TaskDispatcher:
             self.session_tasks = dict()
         self.active_tasks = dict()
         self.task_db = CSVDataOrganizer()
+        self.existing_categories = dict()
 
     def add_new_task(self, task_name, task_category="Empty", activity_periods=None):
         """ Add the task to the list of possible tasks. """
@@ -47,9 +48,17 @@ class TaskDispatcher:
         """ Read tasks from the task database. """
         previous_tasks = self.task_db.read_previous_tasks()
         for task_to_add in previous_tasks:
+            if task_to_add.category in self.existing_categories.keys():
+                self.existing_categories[task_to_add.category] += 1
+            else:
+                self.existing_categories[task_to_add.category] = 1
             self.add_new_task(task_to_add.name, task_to_add.category,
                               task_to_add.activity_periods)
         return previous_tasks
+
+    def get_existing_categories(self):
+        """ Get known categories from history. """
+        return list(self.existing_categories.keys())
 
     def write_changes_for_task(self, task_c):
         """ Write changes on disk and clean the cache. """
