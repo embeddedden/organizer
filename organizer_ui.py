@@ -17,6 +17,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 from kivy.clock import Clock
+from kivy.uix.dropdown import DropDown
 from task_dispatcher import TaskDispatcher
 
 # Regulate button height through this parameter.
@@ -182,11 +183,25 @@ class MainScreen(BoxLayout):
         add_task_button.bind(on_press=self.create_new_task_popup)
         self.add_widget(add_task_button)
 
+
     def create_new_task_popup(self, *args):
         """ Create a popup for a new task. """
         popup_layout = BoxLayout(orientation='vertical')
         popup_layout.spacing = 5
         popup_layout.bind(minimum_height=popup_layout.setter('height'))
+        
+        drop_down = DropDown(size_hint=(None, None),
+                             size=[Window.width, BUTTON_HEIGHT])
+
+        for cat in self.task_dispatcher.get_existing_categories():
+            btn = Button(text=cat, size_hint_y=None, height=BUTTON_HEIGHT)
+            drop_down.add_widget(btn)
+        drop_down_button = Button(text="Выбери категорию",
+                                  size_hint_y=None,
+                                  height=BUTTON_HEIGHT,)
+        drop_down_button.bind(on_release=drop_down.open)
+        popup_layout.add_widget(drop_down_button)
+        
         create_btn = Button(text='Создать задачу',
                             size_hint_y=None,
                             height=BUTTON_HEIGHT)
@@ -200,13 +215,14 @@ class MainScreen(BoxLayout):
         popup_layout.add_widget(create_btn)
         self.popup = Popup(title='Создай новую задачу', content=popup_layout,
                            size_hint=(1, None),
-                           height=create_btn.height+self.create_edit.height+100)
+                           height=create_btn.height+self.create_edit.height+
+                           drop_down_button.height+100)
         create_btn.bind(on_release=self.create_task)
         self.popup.open()
 
     def create_task(self, *args):
         """ Add a task to session tasks. """
-        #TODO: add exception handling
+        #TODO: add exception handling        
         self.task_dispatcher.add_new_task(self.create_edit.text)
         tmp_butt = TaskButton(text=self.create_edit.text,
                               size_hint=(None, None),
