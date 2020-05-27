@@ -39,5 +39,6 @@ class MatPlotter(BoxLayout):
         for i in sorted_view:
             labels_for_pie.append('\n'.join(wrap(i[0], 50)))
             values_for_pie.append(i[1])
-        self.ax1.pie(values_for_pie, labels=labels_for_pie, 
-                autopct=lambda pct:format_label(pct, values_for_pie))
+        self.ax1.pie(values_for_pie, 
+                     autopct=lambda pct:format_label(pct, values_for_pie))
+        plt.legend(labels_for_pie, bbox_to_anchor=(0, 0), loc='upper left')

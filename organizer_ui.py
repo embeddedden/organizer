@@ -19,6 +19,7 @@ from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.uix.dropdown import DropDown
 from task_dispatcher import TaskDispatcher
+from mat_plotter import MatPlotter
 
 # Regulate button height through this parameter.
 BUTTON_HEIGHT = 70
@@ -149,9 +150,9 @@ class MainScreen(BoxLayout):
                              size=[Window.width, BUTTON_HEIGHT])
         menu_box.add_widget(menu_button)
         menu_box.bind(minimum_height=menu_box.setter('height'))
+        menu_button.bind(on_release=self.show_graph_popup)
         menu_box.size_hint_max_y = menu_button.height+5
         self.add_widget(menu_box)
-
 
         taskbox_label = Label(size_hint=(None, None), text="Текущие задачи:")
         taskbox_label.bind(texture_size=taskbox_label.setter('size'))
@@ -182,6 +183,19 @@ class MainScreen(BoxLayout):
                                  size=[Window.width, BUTTON_HEIGHT])
         add_task_button.bind(on_press=self.create_new_task_popup)
         self.add_widget(add_task_button)
+        
+    def show_graph_popup(self, *args):
+        """ Show info on the graph. """
+        #TODO: it doesn't always fit into the parent layout
+        popup_layout = BoxLayout(orientation='vertical')
+        popup_layout.spacing = 5
+        graph_layout = MatPlotter(size_hint=(1, 1))
+        tasks_and_durs = self.task_dispatcher.get_tasks_and_duration()
+        graph_layout.update_graph(tasks_and_durs)
+        popup_layout.add_widget(graph_layout)
+        self.popup_graph = Popup(title='График занятости', content=popup_layout,
+                           size_hint=(1, 1))
+        self.popup_graph.open()
 
     def create_new_task_popup(self, *args):
         """ Create a popup for a new task. """

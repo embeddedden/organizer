@@ -7,6 +7,7 @@ Created on Sun May 17 00:39:50 2020
 
 from task import Task, task_id
 from csv_data_organizer import CSVDataOrganizer
+from datetime import timedelta
 
 class TaskDispatcher:
     """ Implement inner logic of task management. """
@@ -55,6 +56,14 @@ class TaskDispatcher:
             self.add_new_task(task_to_add.name, task_to_add.category,
                               task_to_add.activity_periods)
         return previous_tasks
+    
+    def get_tasks_and_duration(self):
+        tasks_and_durs = dict()
+        for tmp_task_id in self.session_tasks.keys():
+            tasks_and_durs[tmp_task_id] = 0.0
+            for period in self.session_tasks[tmp_task_id].activity_periods:
+                tasks_and_durs[tmp_task_id] += (period[1]-period[0])/timedelta(hours=1)
+        return tasks_and_durs
 
     def get_existing_categories(self):
         """ Get known categories from history. """
