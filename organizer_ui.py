@@ -157,7 +157,7 @@ class MainScreen(BoxLayout):
         taskbox_label.bind(texture_size=taskbox_label.setter('size'))
         self.add_widget(taskbox_label)
 
-        self.current_tasks = TaskScrollView(size_hint=(None, 1),
+        self.current_tasks = TaskScrollView(size_hint=(None, 0.3),
                                             width=Window.width)
         self.add_widget(self.current_tasks)
 
