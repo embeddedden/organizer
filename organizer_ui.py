@@ -184,24 +184,28 @@ class MainScreen(BoxLayout):
         add_task_button.bind(on_press=self.create_new_task_popup)
         self.add_widget(add_task_button)
 
-
     def create_new_task_popup(self, *args):
         """ Create a popup for a new task. """
         popup_layout = BoxLayout(orientation='vertical')
         popup_layout.spacing = 5
         popup_layout.bind(minimum_height=popup_layout.setter('height'))
-        
+        category_label = Label(size_hint=(None, None), text="Выбери категорию:")
+        category_label.bind(texture_size=category_label.setter('size'))
+        popup_layout.add_widget(category_label)
         drop_down = DropDown(size_hint=(None, None),
                              size=[Window.width, BUTTON_HEIGHT])
 
         for cat in self.task_dispatcher.get_existing_categories():
             btn = Button(text=cat, size_hint_y=None, height=BUTTON_HEIGHT)
+            btn.bind(on_release=lambda btn: drop_down.select(btn.text))
             drop_down.add_widget(btn)
-        drop_down_button = Button(text="Выбери категорию",
+        self.drop_down_button = Button(text="Работа",
                                   size_hint_y=None,
                                   height=BUTTON_HEIGHT,)
-        drop_down_button.bind(on_release=drop_down.open)
-        popup_layout.add_widget(drop_down_button)
+        self.drop_down_button.bind(on_release=drop_down.open)
+        drop_down.bind(on_select=lambda instance, x: 
+                        setattr(self.drop_down_button, 'text', x))
+        popup_layout.add_widget(self.drop_down_button)
         
         create_btn = Button(text='Создать задачу',
                             size_hint_y=None,
@@ -217,18 +221,19 @@ class MainScreen(BoxLayout):
         self.popup = Popup(title='Создай новую задачу', content=popup_layout,
                            size_hint=(1, None),
                            height=create_btn.height+self.create_edit.height+
-                           drop_down_button.height+100)
+                           self.drop_down_button.height+100)
         create_btn.bind(on_release=self.create_task)
         self.popup.open()
 
     def create_task(self, *args):
         """ Add a task to session tasks. """
         #TODO: add exception handling        
-        self.task_dispatcher.add_new_task(self.create_edit.text)
+        self.task_dispatcher.add_new_task(self.create_edit.text, 
+                                          self.drop_down_button.text)
         tmp_butt = TaskButton(text=self.create_edit.text,
                               size_hint=(None, None),
                               size=[Window.width, BUTTON_HEIGHT])
-        tmp_butt.category = 'Empty'
+        tmp_butt.category = self.drop_down_button.text
         tmp_butt.bind(on_relocate_event=self.relocation_routine)
         self.task_buttons.add_descendant(tmp_butt)
         self.popup.dismiss()
