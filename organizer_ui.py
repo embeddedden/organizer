@@ -32,7 +32,7 @@ class TaskButton(Button):
     Thus, when a user starts to work on a task he pushes the button, and when
     finishes - releases it.
     """
-    
+
     def __init__(self, **kwargs):
         """ Expand Button kivy class. """
         super().__init__(**kwargs)
@@ -199,13 +199,13 @@ class MainScreen(BoxLayout):
             btn.bind(on_release=lambda btn: drop_down.select(btn.text))
             drop_down.add_widget(btn)
         self.drop_down_button = Button(text="Работа",
-                                  size_hint_y=None,
-                                  height=BUTTON_HEIGHT,)
+                                       size_hint_y=None,
+                                       height=BUTTON_HEIGHT,)
         self.drop_down_button.bind(on_release=drop_down.open)
-        drop_down.bind(on_select=lambda instance, x: 
-                        setattr(self.drop_down_button, 'text', x))
+        drop_down.bind(on_select=lambda instance, x:
+                       setattr(self.drop_down_button, 'text', x))
         popup_layout.add_widget(self.drop_down_button)
-        
+
         create_btn = Button(text='Создать задачу',
                             size_hint_y=None,
                             height=BUTTON_HEIGHT)
@@ -226,8 +226,8 @@ class MainScreen(BoxLayout):
 
     def create_task(self, *args):
         """ Add a task to session tasks. """
-        #TODO: add exception handling        
-        self.task_dispatcher.add_new_task(self.create_edit.text, 
+        #TODO: add exception handling
+        self.task_dispatcher.add_new_task(self.create_edit.text,
                                           self.drop_down_button.text)
         tmp_butt = TaskButton(text=self.create_edit.text,
                               size_hint=(None, None),
@@ -235,6 +235,7 @@ class MainScreen(BoxLayout):
         tmp_butt.category = self.drop_down_button.text
         tmp_butt.bind(on_relocate_event=self.relocation_routine)
         self.task_buttons.add_descendant(tmp_butt)
+        self.popup.dismiss()
 
     def relocation_routine(self, *args):
         """ Relocate a TaskButton from one layout to the other. """
