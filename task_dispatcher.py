@@ -22,7 +22,7 @@ class TaskDispatcher:
         self.task_db = CSVDataOrganizer()
         self.existing_categories = dict()
 
-    def add_new_task(self, task_name, task_category="Empty", activity_periods=None):
+    def add_new_task(self, task_name, task_category=None, activity_periods=None):
         """ Add the task to the list of possible tasks. """
         tmp_task = Task(task_name, task_category, activity_periods)
         #TODO: what should we do if there is a task with an equal name?
