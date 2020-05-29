@@ -58,6 +58,7 @@ class TaskDispatcher:
         return previous_tasks
     
     def get_tasks_and_duration(self):
+        """ Get dicts of tasks and their durations. """
         tasks_and_durs = dict()
         for tmp_task_id in self.session_tasks.keys():
             tasks_and_durs[tmp_task_id] = 0.0
