@@ -145,12 +145,18 @@ class MainScreen(BoxLayout):
         self.spacing = 8
         self.task_dispatcher = TaskDispatcher()
         self.previous_tasks = self.task_dispatcher.get_previous_tasks()
+        drop_down = DropDown(size_hint=(None, None),
+                             size=[Window.width, BUTTON_HEIGHT])
+        btn = Button(text="Показать статистику", size_hint_y=None, 
+                     height=BUTTON_HEIGHT)
+        btn.bind(on_release=self.show_graph_popup)
+        drop_down.add_widget(btn)
         menu_box = BoxLayout(size_hint=(None, None), orientation='horizontal')
         menu_button = Button(text="Меню", size_hint=(None, None),
                              size=[Window.width, BUTTON_HEIGHT])
         menu_box.add_widget(menu_button)
         menu_box.bind(minimum_height=menu_box.setter('height'))
-        menu_button.bind(on_release=self.show_graph_popup)
+        menu_button.bind(on_release=drop_down.open)
         menu_box.size_hint_max_y = menu_button.height+5
         self.add_widget(menu_box)
 
