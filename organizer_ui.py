@@ -150,6 +150,7 @@ class MainScreen(BoxLayout):
         btn = Button(text="Показать статистику", size_hint_y=None, 
                      height=BUTTON_HEIGHT)
         btn.bind(on_release=self.show_graph_popup)
+        btn.bind(on_release=lambda btn: drop_down.select(btn.text))
         drop_down.add_widget(btn)
         menu_box = BoxLayout(size_hint=(None, None), orientation='horizontal')
         menu_button = Button(text="Меню", size_hint=(None, None),
@@ -201,6 +202,10 @@ class MainScreen(BoxLayout):
         popup_layout.add_widget(graph_layout)
         self.popup_graph = Popup(title='График занятости', content=popup_layout,
                            size_hint=(1, 1))
+        close_button = Button(text="Закрыть", size_hint=(None, None),
+                             size=[Window.width, BUTTON_HEIGHT])
+        close_button.bind(on_release=self.popup_graph.dismiss)
+        popup_layout.add_widget(close_button)
         self.popup_graph.open()
 
     def create_new_task_popup(self, *args):
@@ -220,7 +225,7 @@ class MainScreen(BoxLayout):
             drop_down.add_widget(btn)
         self.drop_down_button = Button(text="Работа",
                                        size_hint_y=None,
-                                       height=BUTTON_HEIGHT,)
+                                       height=BUTTON_HEIGHT)
         self.drop_down_button.bind(on_release=drop_down.open)
         drop_down.bind(on_select=lambda instance, x:
                        setattr(self.drop_down_button, 'text', x))
