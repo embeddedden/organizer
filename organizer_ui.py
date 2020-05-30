@@ -202,8 +202,8 @@ class MainScreen(BoxLayout):
         popup_layout.add_widget(graph_layout)
         self.popup_graph = Popup(title='График занятости', content=popup_layout,
                            size_hint=(1, 1))
-        close_button = Button(text="Закрыть", size_hint=(None, None),
-                             size=[Window.width, BUTTON_HEIGHT])
+        close_button = Button(text="Закрыть", size_hint=(1, None),
+                              height=BUTTON_HEIGHT)
         close_button.bind(on_release=self.popup_graph.dismiss)
         popup_layout.add_widget(close_button)
         self.popup_graph.open()
