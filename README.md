@@ -15,12 +15,15 @@ English text see below
 * добавление таймера-помидорро.
 
 Основное окно программы:
+
 ![Основное окно программы](screenshots/main_window.png)
 
 Вывод графика активности по задачам:
+
 ![График активности за день](screenshots/business_graph.png)
 
 Создание новой задачи:
+
 ![Создание новой задачи](screenshots/task_creation_popup.png)
 
 **English version**
