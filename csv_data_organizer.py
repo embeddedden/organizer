@@ -6,7 +6,7 @@ Created on Wed May 20 19:03:22 2020
 """
 
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 from data_organizer import DataOrganizer
 from task import Task, task_id
 
@@ -28,11 +28,14 @@ class CSVDataOrganizer(DataOrganizer):
             with open(self.filename, 'r') as csv_handler:
                 csv_reader = csv.reader(csv_handler, delimiter='|')
                 task_dict = dict()
+                finish_before = datetime.now() - timedelta(days=period)
                 for row in csv_reader:
                     task_category = row[0]
                     task_name = row[1]
                     task_activity = (datetime.fromisoformat(row[2]),
                                      datetime.fromisoformat(row[3]))
+                    if task_activity[1] < finish_before:
+                        continue
                     if task_id(task_name, task_category) not in task_dict:
                         task_dict[task_id(task_name, task_category)] = \
                         Task(task_name, task_category, [task_activity])
