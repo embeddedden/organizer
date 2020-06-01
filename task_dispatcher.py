@@ -7,7 +7,7 @@ Created on Sun May 17 00:39:50 2020
 
 from task import Task, task_id
 from csv_data_organizer import CSVDataOrganizer
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 class TaskDispatcher:
     """ Implement inner logic of task management. """
@@ -45,9 +45,9 @@ class TaskDispatcher:
         self.session_tasks[task_id(task_name, task_category)].stop_task()
         self.task_db.write_tasks_data([self.session_tasks[task_id(task_name, task_category)]])
 
-    def get_previous_tasks(self, period=None):
+    def get_previous_tasks(self, period=7):
         """ Read tasks from the task database. """
-        previous_tasks = self.task_db.read_previous_tasks()
+        previous_tasks = self.task_db.read_previous_tasks(period)
         for task_to_add in previous_tasks:
             if task_to_add.category in self.existing_categories.keys():
                 self.existing_categories[task_to_add.category] += 1
@@ -57,13 +57,22 @@ class TaskDispatcher:
                               task_to_add.activity_periods)
         return previous_tasks
     
-    def get_tasks_and_duration(self):
+    def get_tasks_and_duration(self, period=7, min_dur_bound=5):
         """ Get dicts of tasks and their durations. """
         tasks_and_durs = dict()
+        finish_before = datetime.now() - timedelta(days=period)
+        # A lot of unneeded loads and stores, can be optimized
         for tmp_task_id in self.session_tasks.keys():
             tasks_and_durs[tmp_task_id] = 0.0
             for period in self.session_tasks[tmp_task_id].activity_periods:
-                tasks_and_durs[tmp_task_id] += (period[1]-period[0])/timedelta(hours=1)
+                if period[1] > finish_before:
+                    tasks_and_durs[tmp_task_id] += (period[1]-period[0])/timedelta(hours=1)
+        tasks_to_delete = []
+        for tmp_task_id in tasks_and_durs.keys():
+            if tasks_and_durs[tmp_task_id] < timedelta(minutes=min_dur_bound)/timedelta(hours=1):
+                tasks_to_delete.append(tmp_task_id)
+        for a in tasks_to_delete:
+            del tasks_and_durs[a]
         return tasks_and_durs
 
     def get_existing_categories(self):
