@@ -39,6 +39,9 @@ class MatPlotter(BoxLayout):
         for i in sorted_view:
             labels_for_pie.append('\n'.join(wrap(i[0], 50)))
             values_for_pie.append(i[1])
+        if (sum(values_for_pie) < 1.0):
+            #TODO: better visulization for minutes is needed
+            values_for_pie = [i * 60 for i in values_for_pie]# show in minutes
         self.ax1.pie(values_for_pie, 
                      autopct=lambda pct:format_label(pct, values_for_pie))
         plt.legend(labels_for_pie, bbox_to_anchor=(0, 0), loc='upper left')
