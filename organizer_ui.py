@@ -20,6 +20,7 @@ from kivy.clock import Clock
 from kivy.uix.dropdown import DropDown
 from task_dispatcher import TaskDispatcher
 from mat_plotter import MatPlotter
+from pomidorro import Pomidorro
 
 # Regulate button height through this parameter.
 BUTTON_HEIGHT = 70
@@ -85,6 +86,7 @@ class VertBoxLayout(BoxLayout):
     def __init__(self, **kwargs):
         """ Initialize class by placing a placeholder Label. """
         super().__init__(**kwargs)
+        self.emptiness = True
         self.empty_label = Label(size_hint=(None, None),
                                  text="Нет текущих задач",
                                  size=(Window.width, BUTTON_HEIGHT))
@@ -94,6 +96,7 @@ class VertBoxLayout(BoxLayout):
         """ Override BoxLayou.addWidget(). """
         if self.children[0] == self.empty_label:
             super().remove_widget(self.empty_label)
+            self.emptiness = False
 
         super().add_widget(*args)
 
@@ -102,6 +105,11 @@ class VertBoxLayout(BoxLayout):
         super().remove_widget(*args)
         if not self.children:
             super().add_widget(self.empty_label)
+            self.emptiness = True
+            
+    def is_empty(self):
+        """ Whether contain any buttons or not. """
+        return self.emptiness
 
 class TaskScrollView(ScrollView):
     """
@@ -126,6 +134,9 @@ class TaskScrollView(ScrollView):
     def remove_descendant(self, obj):
         """ Remove widget obj from the child box layout. """
         self.box_lt.remove_widget(obj)
+    
+    def is_empty(self):
+        return self.box_lt.is_empty()
 
 class MainScreen(BoxLayout):
     """
@@ -164,7 +175,19 @@ class MainScreen(BoxLayout):
         taskbox_label = Label(size_hint=(None, None), text="Текущие задачи:")
         taskbox_label.bind(texture_size=taskbox_label.setter('size'))
         self.add_widget(taskbox_label)
+        
+        pomid_label = Label(size_hint=(None, None), text="Непрерывная занятость",
+                            pos_hint={'x': 0.5})
+        pomid_label.bind(texture_size=pomid_label.setter('size'))
+        self.add_widget(pomid_label)
+        self.pomid_timer = Pomidorro(max=45, size_hint=(None, None),
+                                width=0.75*Window.width, 
+                                height=0.3*BUTTON_HEIGHT,
+                                #TODO: magic value 0.2, don't know how to center
+                                pos_hint={'x': 0.2}) 
+        self.add_widget(self.pomid_timer)
 
+        #Active tasks
         self.current_tasks = TaskScrollView(size_hint=(None, 0.3),
                                             width=Window.width)
         self.add_widget(self.current_tasks)
@@ -172,7 +195,7 @@ class MainScreen(BoxLayout):
         new_taskbox_label = Label(size_hint=(None, None), text="Все задачи:")
         new_taskbox_label.bind(texture_size=new_taskbox_label.setter('size'))
         self.add_widget(new_taskbox_label)
-
+        # Possible stopped tasks
         self.task_buttons = TaskScrollView(size_hint=(None, 1),
                                            width=Window.width)
         self.add_widget(self.task_buttons)
@@ -264,6 +287,8 @@ class MainScreen(BoxLayout):
 
     def relocation_routine(self, *args):
         """ Relocate a TaskButton from one layout to the other. """
+        if self.current_tasks.is_empty():
+            self.pomid_timer.start()
         if args[-1] in self.task_buttons.box_lt.children:
             self.task_dispatcher.make_task_active(args[-1].name, args[-1].category)
             self.task_buttons.remove_descendant(args[-1])
@@ -272,6 +297,8 @@ class MainScreen(BoxLayout):
             self.task_dispatcher.make_task_stopped(args[-1].name, args[-1].category)
             self.current_tasks.remove_descendant(args[-1])
             self.task_buttons.add_descendant(args[-1])
+        if self.current_tasks.is_empty():
+            self.pomid_timer.stop()
 
 class Organizer(App):
     """ Class representing the Application. """
