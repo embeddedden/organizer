@@ -19,7 +19,7 @@ from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.uix.dropdown import DropDown
 from task_dispatcher import TaskDispatcher
-from mat_plotter import MatPlotter
+#from mat_plotter import MatPlotter
 from pomidorro import Pomidorro
 
 # Regulate button height through this parameter.
@@ -106,7 +106,7 @@ class VertBoxLayout(BoxLayout):
         if not self.children:
             super().add_widget(self.empty_label)
             self.emptiness = True
-            
+
     def is_empty(self):
         """ Whether contain any buttons or not. """
         return self.emptiness
@@ -134,7 +134,7 @@ class TaskScrollView(ScrollView):
     def remove_descendant(self, obj):
         """ Remove widget obj from the child box layout. """
         self.box_lt.remove_widget(obj)
-    
+
     def is_empty(self):
         return self.box_lt.is_empty()
 
@@ -158,7 +158,7 @@ class MainScreen(BoxLayout):
         self.previous_tasks = self.task_dispatcher.get_previous_tasks()
         self.drop_down = DropDown(size_hint=(None, None),
                              size=[Window.width, BUTTON_HEIGHT])
-        btn = Button(text="Показать статистику", size_hint_y=None, 
+        btn = Button(text="Показать статистику", size_hint_y=None,
                      height=BUTTON_HEIGHT)
         btn.bind(on_release=self.show_graph_popup)
         btn.bind(on_release=lambda btn: self.drop_down.select(btn.text))
@@ -175,16 +175,16 @@ class MainScreen(BoxLayout):
         taskbox_label = Label(size_hint=(None, None), text="Текущие задачи:")
         taskbox_label.bind(texture_size=taskbox_label.setter('size'))
         self.add_widget(taskbox_label)
-        
+
         pomid_label = Label(size_hint=(None, None), text="Непрерывная занятость",
                             pos_hint={'x': 0.5})
         pomid_label.bind(texture_size=pomid_label.setter('size'))
         self.add_widget(pomid_label)
         self.pomid_timer = Pomidorro(max=45, size_hint=(None, None),
-                                width=0.75*Window.width, 
+                                width=0.75*Window.width,
                                 height=0.3*BUTTON_HEIGHT,
                                 #TODO: magic value 0.2, don't know how to center
-                                pos_hint={'x': 0.2}) 
+                                pos_hint={'x': 0.2})
         self.add_widget(self.pomid_timer)
 
         #Active tasks
@@ -213,7 +213,7 @@ class MainScreen(BoxLayout):
                                  size=[Window.width, BUTTON_HEIGHT])
         add_task_button.bind(on_press=self.create_new_task_popup)
         self.add_widget(add_task_button)
-        
+
     def show_graph_popup(self, *args):
         """ Show info on the graph. """
         #TODO: it doesn't always fit into the parent layout
@@ -246,6 +246,10 @@ class MainScreen(BoxLayout):
             btn = Button(text=cat, size_hint_y=None, height=BUTTON_HEIGHT)
             btn.bind(on_release=lambda btn: drop_down.select(btn.text))
             drop_down.add_widget(btn)
+
+        btn = Button(text="Создать категорию", size_hint_y=None, height=BUTTON_HEIGHT)
+        btn.bind(on_release=self.create_category_popup)
+        drop_down.add_widget(btn)
         self.drop_down_button = Button(text="Работа",
                                        size_hint_y=None,
                                        height=BUTTON_HEIGHT)
@@ -271,6 +275,35 @@ class MainScreen(BoxLayout):
                            self.drop_down_button.height+100)
         create_btn.bind(on_release=self.create_task)
         self.popup.open()
+
+    def create_category_popup(self, *args):
+        """ Create a popup for a new category. """
+        popup_layout = BoxLayout(orientation='vertical')
+        popup_layout.spacing = 5
+        category_label = Label(size_hint=(None, None),
+                               text="Введи имя новой категории:")
+        category_label.bind(texture_size=category_label.setter('size'))
+        popup_layout.add_widget(category_label)
+        create_cat = Button(text='Создать категорию',
+                            size_hint_y=None,
+                            height=BUTTON_HEIGHT)
+        self.create_edit = TextInput(font_size=18, halign='center',
+                                     hint_text='Введите имя категории',
+                                     size_hint_y=None,
+                                     height=BUTTON_HEIGHT,
+                                     multiline=False)
+        self.create_edit.bind(on_text_validate=self.create_category)
+        popup_layout.add_widget(self.create_edit)
+        popup_layout.add_widget(create_cat)
+        self.popup = Popup(title='Создай новую задачу', content=popup_layout,
+                           size_hint=(1, None),
+                           height=create_cat.height+self.create_edit.height+100)
+        create_cat.bind(on_release=self.create_category)
+        self.popup.open()
+
+    def create_category(self, *args):
+        """ Create a new category for a task. """
+        print(args)
 
     def create_task(self, *args):
         """ Add a task to session tasks. """
