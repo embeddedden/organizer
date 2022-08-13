@@ -19,6 +19,8 @@ from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.uix.dropdown import DropDown
 from task_dispatcher import TaskDispatcher
+# TODO: broken dependancy here in kivy-garden package, waiting for the master
+# branch update
 #from mat_plotter import MatPlotter
 from pomidorro import Pomidorro
 
@@ -160,8 +162,9 @@ class MainScreen(BoxLayout):
                              size=[Window.width, BUTTON_HEIGHT])
         btn = Button(text="Показать статистику", size_hint_y=None,
                      height=BUTTON_HEIGHT)
-        btn.bind(on_release=self.show_graph_popup)
-        btn.bind(on_release=lambda btn: self.drop_down.select(btn.text))
+        #TODO: temprarilly disconnect the button, due to a broken dependancy
+        #btn.bind(on_release=self.show_graph_popup)
+        #btn.bind(on_release=lambda btn: self.drop_down.select(btn.text))
         self.drop_down.add_widget(btn)
         menu_box = BoxLayout(size_hint=(None, None), orientation='horizontal')
         menu_button = Button(text="Меню", size_hint=(None, None),
