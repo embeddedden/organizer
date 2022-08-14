@@ -4,9 +4,11 @@ Class for a task abstraction.
 
 from datetime import datetime
 
+
 def task_id(task_name, task_category):
     """ Transform task category and name into a task id. """
     return task_category + '|' + task_name
+
 
 class Task:
     """ This is a class representing task entity. """
@@ -18,7 +20,7 @@ class Task:
         The task entity is needed to account all activity's busy periods.
 
         :param name: name of the activity
-        :parem category: category of the activity
+        :param category: category of the activity
         :param activity_periods: list of tuples (start_time, end_time)
         """
         if category is not None:
@@ -30,7 +32,7 @@ class Task:
             self.name = name
         else:
             self.name = "New task"
-        self.state = 'Stopped' # or Active, or Paused
+        self.state = 'Stopped'  # or Active, or Paused
         self.current_start_time = None
         self.new_activity_periods = []
         if activity_periods is not None:
@@ -49,7 +51,7 @@ class Task:
         self.activity_periods.append((start_time, end_time))
 
     def start_task(self):
-        """ Start countig time for the task. """
+        """ Start counting time for the task. """
         self.current_start_time = datetime.now()
         self.state = 'Active'
 
@@ -62,7 +64,7 @@ class Task:
     def pause_task(self):
         """ Pause the counting time for the task. """
         self.stop_task()
-        self.state('Stopped')
+        self.state = 'Stopped'
 
     def unpause_task(self):
         """ Unpause the paused task """

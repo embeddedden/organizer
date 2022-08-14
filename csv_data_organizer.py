@@ -10,11 +10,12 @@ from datetime import datetime, timedelta
 from data_organizer import DataOrganizer
 from task import Task, task_id
 
+
 class CSVDataOrganizer(DataOrganizer):
     """
     Read and write data to csv storage.
 
-    Right now, there are the following fileds:
+    Right now, there are the following fields:
     category_name, task_name, start_time, finish_time
     """
 
@@ -38,17 +39,17 @@ class CSVDataOrganizer(DataOrganizer):
                         continue
                     if task_id(task_name, task_category) not in task_dict:
                         task_dict[task_id(task_name, task_category)] = \
-                        Task(task_name, task_category, [task_activity])
+                            Task(task_name, task_category, [task_activity])
                     else:
-                        task_dict[task_id(task_name, task_category)].\
-                        activity_periods.append(task_activity)
+                        task_dict[task_id(task_name, task_category)]. \
+                            activity_periods.append(task_activity)
                 return list(task_dict.values())
         except FileNotFoundError:
             return []
 
     def write_tasks_data(self, tasks):
         """ Write data to CSV storage. """
-        #TODO: what kind of error handling should be here
+        # TODO: what kind of error handling should be here
         with open(self.filename, 'a') as csv_handler:
             csv_writer = csv.writer(csv_handler, delimiter='|')
             for task_it in tasks:

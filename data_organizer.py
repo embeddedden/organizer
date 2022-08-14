@@ -7,6 +7,7 @@ Created on Mon May 18 20:13:04 2020
 
 from abc import ABC, abstractmethod
 
+
 class DataOrganizer(ABC):
     """ Abstract class defining interface for CSV, DB managers. """
 

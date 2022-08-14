@@ -9,7 +9,6 @@ from kivy.uix.progressbar import ProgressBar
 from kivy.clock import Clock
 
 
-
 class Pomidorro(ProgressBar):
     """ Implement pomidorro timer. """
     
@@ -22,7 +21,6 @@ class Pomidorro(ProgressBar):
         self.pomid_event = Clock.create_trigger(self.update, 
                                                 timeout=60, interval=True)
         self.pomid_event()
-        print(self.max, self.value)
     
     def stop(self):
         """ Stop pomidorro and set its value to zero"""
@@ -33,4 +31,4 @@ class Pomidorro(ProgressBar):
         """ Add a minute  to pomiddoro """
         if self.value+1 <= self.max:
             self.value += 1
-        #else: show popup
+        # else: show popup

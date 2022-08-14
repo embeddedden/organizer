@@ -5,9 +5,6 @@ Created on Fri May  1 20:59:21 2020
 @author: embden
 """
 from kivy.config import Config
-Config.set('graphics', 'width', '480')
-Config.set('graphics', 'height', '640')
-
 from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -19,20 +16,23 @@ from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.uix.dropdown import DropDown
 from task_dispatcher import TaskDispatcher
-# TODO: broken dependancy here in kivy-garden package, waiting for the master
-# branch update
-#from mat_plotter import MatPlotter
+# TODO: broken dependency here in kivy-garden package, waiting for the master branch update
+# from mat_plotter import MatPlotter
 from pomidorro import Pomidorro
+
+Config.set('graphics', 'width', '480')
+Config.set('graphics', 'height', '640')
 
 # Regulate button height through this parameter.
 BUTTON_HEIGHT = 70
+
 
 class TaskButton(Button):
     """
     Class representing a button for a task expanding standard kivy button.
 
     The distinctive feature of the class is its capability to be in two states:
-    active or waiting. In active state a button shold look like a push button.
+    active or waiting. In active state a button should look like a push button.
     Thus, when a user starts to work on a task he pushes the button, and when
     finishes - releases it.
     """
@@ -42,7 +42,7 @@ class TaskButton(Button):
         super().__init__(**kwargs)
         self.register_event_type('on_relocate_event')
         self.category = 'Empty'
-        self.activity_state = 'Waiting' # or 'Active', or 'Removed'
+        self.activity_state = 'Waiting'  # or 'Active', or 'Removed'
         self.name = self.text
         self.hours = 0
         self.minutes = 0
@@ -50,6 +50,7 @@ class TaskButton(Button):
         self.time_in_seconds = 0
         self.c_event = Clock.create_trigger(self.update_clock, timeout=1,
                                             interval=True)
+
     def on_relocate_event(self, *args):
         """ Default handler for on_relocate_event. """
         pass
@@ -57,8 +58,8 @@ class TaskButton(Button):
     def on_press(self):
         """ Override default on_press handler. """
         self.dispatch('on_relocate_event')
-        #TODO: we should remove background_normal because it is mixed with
-        #background_color
+        # TODO: we should remove background_normal because it is mixed with
+        # background_color
         if self.activity_state == 'Waiting':
             self.c_event()
             self.activity_state = 'Active'
@@ -76,6 +77,7 @@ class TaskButton(Button):
         self.minutes = self.time_in_seconds // 60 % 60
         self.hours = self.time_in_seconds // 60 // 60 % 24
         self.text = f'{self.name} ({self.hours:02}:{self.minutes:02}:{self.seconds:02})'
+
 
 class VertBoxLayout(BoxLayout):
     """
@@ -95,7 +97,7 @@ class VertBoxLayout(BoxLayout):
         super().add_widget(self.empty_label)
 
     def add_widget(self, *args):
-        """ Override BoxLayou.addWidget(). """
+        """ Override BoxLayout.addWidget(). """
         if self.children[0] == self.empty_label:
             super().remove_widget(self.empty_label)
             self.emptiness = False
@@ -103,7 +105,7 @@ class VertBoxLayout(BoxLayout):
         super().add_widget(*args)
 
     def remove_widget(self, *args):
-        """ Override BoxLayou.removeWidget(). """
+        """ Override BoxLayout.removeWidget(). """
         super().remove_widget(*args)
         if not self.children:
             super().add_widget(self.empty_label)
@@ -113,12 +115,13 @@ class VertBoxLayout(BoxLayout):
         """ Whether contain any buttons or not. """
         return self.emptiness
 
+
 class TaskScrollView(ScrollView):
     """
     ScrollView that is able to receive and remove TaskButtons.
 
     Class consists of VertBoxLayout widget and is able to receive/send
-    TaskButtons from/to its VertBoxLayout child. Class exapnd default Kive
+    TaskButtons from/to its VertBoxLayout child. Class expand default Kivy
     ScrollView class.
     """
 
@@ -140,6 +143,7 @@ class TaskScrollView(ScrollView):
     def is_empty(self):
         return self.box_lt.is_empty()
 
+
 class MainScreen(BoxLayout):
     """
     Class for managing UI of the organizer application.
@@ -159,12 +163,12 @@ class MainScreen(BoxLayout):
         self.task_dispatcher = TaskDispatcher()
         self.previous_tasks = self.task_dispatcher.get_previous_tasks()
         self.drop_down = DropDown(size_hint=(None, None),
-                             size=[Window.width, BUTTON_HEIGHT])
+                                  size=[Window.width, BUTTON_HEIGHT])
         btn = Button(text="Показать статистику", size_hint_y=None,
                      height=BUTTON_HEIGHT)
-        #TODO: temprarilly disconnect the button, due to a broken dependancy
-        #btn.bind(on_release=self.show_graph_popup)
-        #btn.bind(on_release=lambda btn: self.drop_down.select(btn.text))
+        # TODO: temporarily disconnect the button, due to a broken dependency
+        # btn.bind(on_release=self.show_graph_popup)
+        # btn.bind(on_release=lambda btn: self.drop_down.select(btn.text))
         self.drop_down.add_widget(btn)
         menu_box = BoxLayout(size_hint=(None, None), orientation='horizontal')
         menu_button = Button(text="Меню", size_hint=(None, None),
@@ -184,13 +188,13 @@ class MainScreen(BoxLayout):
         pomid_label.bind(texture_size=pomid_label.setter('size'))
         self.add_widget(pomid_label)
         self.pomid_timer = Pomidorro(max=45, size_hint=(None, None),
-                                width=0.75*Window.width,
-                                height=0.3*BUTTON_HEIGHT,
-                                #TODO: magic value 0.2, don't know how to center
-                                pos_hint={'x': 0.2})
+                                     width=0.75*Window.width,
+                                     height=0.3*BUTTON_HEIGHT,
+                                     # TODO: magic value 0.2, don't know how to center
+                                     pos_hint={'x': 0.2})
         self.add_widget(self.pomid_timer)
 
-        #Active tasks
+        # Active tasks
         self.current_tasks = TaskScrollView(size_hint=(None, 0.3),
                                             width=Window.width)
         self.add_widget(self.current_tasks)
@@ -219,7 +223,7 @@ class MainScreen(BoxLayout):
 
     def show_graph_popup(self, *args):
         """ Show info on the graph. """
-        #TODO: it doesn't always fit into the parent layout
+        # TODO: it doesn't always fit into the parent layout
         popup_layout = BoxLayout(orientation='vertical')
         popup_layout.spacing = 5
         graph_layout = MatPlotter(size_hint=(1, 1))
@@ -227,7 +231,7 @@ class MainScreen(BoxLayout):
         graph_layout.update_graph(tasks_and_durs)
         popup_layout.add_widget(graph_layout)
         self.popup_graph = Popup(title='График занятости', content=popup_layout,
-                           size_hint=(1, 1))
+                                 size_hint=(1, 1))
         close_button = Button(text="Закрыть", size_hint=(1, None),
                               height=BUTTON_HEIGHT)
         close_button.bind(on_release=self.popup_graph.dismiss)
@@ -274,8 +278,8 @@ class MainScreen(BoxLayout):
         popup_layout.add_widget(create_btn)
         self.popup = Popup(title='Создай новую задачу', content=popup_layout,
                            size_hint=(1, None),
-                           height=create_btn.height+self.create_edit.height+
-                           self.drop_down_button.height+100)
+                           height=create_btn.height + self.create_edit.height +
+                           self.drop_down_button.height + 100)
         create_btn.bind(on_release=self.create_task)
         self.popup.open()
 
@@ -310,7 +314,7 @@ class MainScreen(BoxLayout):
 
     def create_task(self, *args):
         """ Add a task to session tasks. """
-        #TODO: add exception handling
+        # TODO: add exception handling
         self.task_dispatcher.add_new_task(self.create_edit.text,
                                           self.drop_down_button.text)
         tmp_butt = TaskButton(text=self.create_edit.text,
@@ -336,12 +340,14 @@ class MainScreen(BoxLayout):
         if self.current_tasks.is_empty():
             self.pomid_timer.stop()
 
+
 class Organizer(App):
     """ Class representing the Application. """
 
     def build(self):
         """ Routine for creating the Window. """
         return MainScreen()
+
 
 if __name__ == '__main__':
     Organizer().run()

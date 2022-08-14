@@ -9,6 +9,7 @@ from task import Task, task_id
 from csv_data_organizer import CSVDataOrganizer
 from datetime import timedelta, datetime
 
+
 class TaskDispatcher:
     """ Implement inner logic of task management. """
 
@@ -26,21 +27,21 @@ class TaskDispatcher:
     def add_new_task(self, task_name, task_category=None, activity_periods=None):
         """ Add the task to the list of possible tasks. """
         tmp_task = Task(task_name, task_category, activity_periods)
-        #TODO: what should we do if there is a task with an equal name?
+        # TODO: what should we do if there is a task with an equal name?
         # Generate exception NameExists?
         self.session_tasks[task_id(task_name, task_category)] = tmp_task
         self.write_changes_for_task(self.session_tasks[task_id(task_name, task_category)])
 
     def make_task_active(self, task_name, task_category):
         """ Add the task to the list of active tasks. """
-        #TODO: Exception handling is required here
+        # TODO: Exception handling is required here
         self.active_tasks[task_id(task_name, task_category)] =\
-        self.session_tasks[task_id(task_name, task_category)]
+            self.session_tasks[task_id(task_name, task_category)]
         self.session_tasks[task_id(task_name, task_category)].start_task()
 
     def make_task_stopped(self, task_name, task_category):
         """ Add the task to the list of stopped tasks. """
-        #TODO: Exception handling is required here
+        # TODO: Exception handling is required here
         self.active_tasks.pop(task_id(task_name, task_category))
         self.session_tasks[task_id(task_name, task_category)].stop_task()
         self.task_db.write_tasks_data([self.session_tasks[task_id(task_name, task_category)]])
